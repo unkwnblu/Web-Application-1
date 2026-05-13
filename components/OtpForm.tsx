@@ -7,6 +7,7 @@ import { createAutoNotification } from "@/app/actions/notifications";
 import AuthButton from "@/components/AuthButton";
 import Link from "next/link";
 import { FaAngleLeft } from "react-icons/fa6";
+import { toast } from "sonner";
 
 export default function OtpForm() {
   const router = useRouter();
@@ -88,6 +89,7 @@ export default function OtpForm() {
       setError(error.message);
       setLoading(false);
     } else {
+      toast.success("Account created successfully!");
       createAutoNotification({
         title: "Welcome to Nokslock! \ud83c\udf89",
         message:

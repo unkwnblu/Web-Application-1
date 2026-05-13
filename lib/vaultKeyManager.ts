@@ -15,6 +15,7 @@ import {
     wrapVaultKey,
     unwrapVaultKey,
 } from "@/lib/crypto";
+import { saveInitialEncryptionKeys } from "@/app/actions/encryption-keys";
 
 // In-memory store — restored from sessionStorage on page refresh, cleared on tab close
 let vaultKey: CryptoKey | null = null;
@@ -78,34 +79,15 @@ export async function initializeVaultKey(
     password: string,
     userId: string,
 ): Promise<void> {
-    const supabase = getSupabaseBrowserClient();
-
-    // Step 1: Generate salt
     const saltBase64 = generateUserSalt();
-
-    // Step 2: Derive Master Key
     const masterKey = await deriveMasterKey(password, saltBase64);
-
-    // Step 3: Generate Vault Key
     const newVaultKey = await generateVaultKey();
-
-    // Step 4: Wrap Vault Key
     const encryptedVaultKey = await wrapVaultKey(newVaultKey, masterKey);
 
-    // Step 5: Persist to Supabase
-    const { error } = await (supabase.from("user_encryption_keys") as any).insert(
-        {
-            user_id: userId,
-            user_salt: saltBase64,
-            encrypted_vault_key: encryptedVaultKey,
-        },
-    );
+    // Use server action with admin client — the user has no active session
+    // yet (email not confirmed), so browser client would fail RLS.
+    await saveInitialEncryptionKeys(userId, saltBase64, encryptedVaultKey);
 
-    if (error) {
-        throw new Error(`Failed to save encryption keys: ${error.message}`);
-    }
-
-    // Step 6: Store in memory and session
     vaultKey = newVaultKey;
     await saveKeyToSession(vaultKey);
 }

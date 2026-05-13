@@ -113,8 +113,7 @@ export default function BioForm() {
         await initializeVaultKey(formData.password, userId);
       }
 
-      // Success
-      toast.success("Account created successfully!");
+      toast.info("Verification code sent to your email.");
       sessionStorage.removeItem("registerEmail");
       router.push(`/register/email-otp?email=${encodeURIComponent(email)}`);
 

@@ -114,8 +114,6 @@ describe("Registration: initializeVaultKey", () => {
   });
 
   it("creates vault key and stores it in memory after registration", async () => {
-    encryptionKeysChain.insert.mockResolvedValue({ error: null });
-
     await initializeVaultKey(TEST_PASSWORD, TEST_USER_ID);
 
     expect(isVaultUnlocked()).toBe(true);
@@ -125,8 +123,6 @@ describe("Registration: initializeVaultKey", () => {
   });
 
   it("persists salt and wrapped key to database", async () => {
-    encryptionKeysChain.insert.mockResolvedValue({ error: null });
-
     await initializeVaultKey(TEST_PASSWORD, TEST_USER_ID);
 
     expect(encryptionKeysChain.insert).toHaveBeenCalledWith(
@@ -145,8 +141,6 @@ describe("Registration: initializeVaultKey", () => {
   });
 
   it("stores vault key in sessionStorage for page refresh", async () => {
-    encryptionKeysChain.insert.mockResolvedValue({ error: null });
-
     await initializeVaultKey(TEST_PASSWORD, TEST_USER_ID);
 
     const stored = sessionStorageMap.get("nokslock_vk");
@@ -165,8 +159,6 @@ describe("Registration: initializeVaultKey", () => {
   });
 
   it("vault key can encrypt and decrypt data after registration", async () => {
-    encryptionKeysChain.insert.mockResolvedValue({ error: null });
-
     await initializeVaultKey(TEST_PASSWORD, TEST_USER_ID);
 
     const vaultKey = getVaultKey();
@@ -697,7 +689,6 @@ describe("Edge Cases & Security", () => {
   it("clearVaultKey removes key from memory and sessionStorage", async () => {
     // Set up vault key in memory
     encryptionKeysChain = createChainableMock();
-    encryptionKeysChain.insert.mockResolvedValue({ error: null });
     await initializeVaultKey(TEST_PASSWORD, TEST_USER_ID);
 
     expect(isVaultUnlocked()).toBe(true);
